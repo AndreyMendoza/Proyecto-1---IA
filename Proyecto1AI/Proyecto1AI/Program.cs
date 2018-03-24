@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Proyecto1AI.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,10 @@ namespace Proyecto1AI
     {
         static void Main(string[] args)
         {
+            // Testing the board initialization
+            Board board = new Board("Andrey", 10, 10, 10);
+            Console.ReadKey();
+            
         }
     }
 }
