@@ -47,9 +47,9 @@ namespace Proyecto1AI.Model
         private void InitBoardMatrix()
         {
             // First, init ALL the board with 0s
-            for (int i = 0; i < Size.Item1; i++)
+            for (int i = 0; i <= Size.Item1; i++)
             {
-                for (int j = 0; j < Size.Item2; j++)
+                for (int j = 0; j <= Size.Item2; j++)
                 {
                     BoardMatrix[i, j] = (int) BoardPositionStatus.Empty;
                 }
@@ -100,5 +100,64 @@ namespace Proyecto1AI.Model
             return new Tuple<int, int>(Row, Column);
         }
 
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Moves the agent in the board if possible
+        public bool MoveAgent(AgentMovement Direction)
+        {
+            Tuple<int, int> MovementPosition = new Tuple<int, int>(-1, -1);
+
+            // Create the tuple with the goal direction
+            switch (Direction)
+            {
+                case AgentMovement.Up:
+                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1, Agent.Position.Item2 - 1);
+                    break;
+                case AgentMovement.Down:
+                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1, Agent.Position.Item2 + 1);
+                    break;
+                case AgentMovement.Right:
+                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 + 1, Agent.Position.Item2);
+                    break;
+                case AgentMovement.Left:
+                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 - 1, Agent.Position.Item2);
+                    break;
+                case AgentMovement.UpRight:
+                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 + 1, Agent.Position.Item2 - 1);
+                    break;
+                case AgentMovement.UpLeft:
+                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 - 1, Agent.Position.Item2 - 1);
+                    break;
+                case AgentMovement.DownRight:
+                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 + 1, Agent.Position.Item2 + 1);
+                    break;
+                case AgentMovement.DownLeft:
+                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 - 1, Agent.Position.Item2 + 1);
+                    break;
+            }
+
+            // Updates the board with the Agent's position
+            if (IsValidMovement(MovementPosition))
+            {
+                BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = (int)BoardPositionStatus.Empty;
+                Agent.Position = MovementPosition;
+                BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = (int)BoardPositionStatus.Agent;
+
+                return true;
+            }
+            return false;
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+        
+        // Verifies if a movement is valid
+        public bool IsValidMovement(Tuple<int, int> Goal)
+        {
+            if (Size.Item1 <= Goal.Item1 && Size.Item2 <= Goal.Item2
+                && BoardMatrix[Goal.Item1, Goal.Item2] == (int)BoardPositionStatus.Empty)
+                return true;
+            else
+                return false;
+        }
     }
 }

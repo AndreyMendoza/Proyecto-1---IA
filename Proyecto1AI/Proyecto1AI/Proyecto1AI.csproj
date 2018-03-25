@@ -47,6 +47,7 @@
     <Compile Include="Model\BoardItem.cs" />
     <Compile Include="Controller\MainController.cs" />
     <Compile Include="Model\BoardPositionStatus.cs" />
+    <Compile Include="Model\AgentMovement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
