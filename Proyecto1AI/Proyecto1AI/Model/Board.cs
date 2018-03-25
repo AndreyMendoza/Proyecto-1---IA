@@ -15,7 +15,6 @@ namespace Proyecto1AI.Model
         public int ItemSize { get; set; }
         public int[,] BoardMatrix { get; set; }
 
-
         // Constructor
         public Board(string AgentName, int ItemSizeIn, int Width, int Height)
         {
@@ -38,8 +37,8 @@ namespace Proyecto1AI.Model
             Agent.Position = RandomBoardPosition();
             Agent.Path = "Sonrisas.png";
 
-            BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = 2;
-            BoardMatrix[Agent.Goal.Item1, Agent.Goal.Item2] = 3;
+            BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = (int) BoardPositionStatus.Agent;
+            BoardMatrix[Agent.Goal.Item1, Agent.Goal.Item2] = (int)BoardPositionStatus.AgentGoal;
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -47,19 +46,19 @@ namespace Proyecto1AI.Model
         // Fills the Matrix with 0s and 1s(obstacles)
         private void InitBoardMatrix()
         {
-            // First, init ALL the board with 1s
+            // First, init ALL the board with 0s
             for (int i = 0; i < Size.Item1; i++)
             {
                 for (int j = 0; j < Size.Item2; j++)
                 {
-                    BoardMatrix[i, j] = 0;
+                    BoardMatrix[i, j] = (int) BoardPositionStatus.Empty;
                 }
             }
 
-            // Set 0s for each obstacle
+            // Set 1s for each obstacle
             foreach (BoardItem obstacle in Obstacles)
             {
-                BoardMatrix[obstacle.Position.Item1, obstacle.Position.Item2] = 1;
+                BoardMatrix[obstacle.Position.Item1, obstacle.Position.Item2] = (int)BoardPositionStatus.Obstacle;
             }
         }
 
@@ -78,7 +77,7 @@ namespace Proyecto1AI.Model
                     Position = position,
                     Path = "ruta"
                 };
-                BoardMatrix[position.Item1, position.Item2] = 1;
+                BoardMatrix[position.Item1, position.Item2] = (int)BoardPositionStatus.Obstacle;
                 Obstacles.Add(NewObstacle);
                 nObstacles--;
             }

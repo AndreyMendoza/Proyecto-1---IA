@@ -14,7 +14,7 @@ namespace Proyecto1AI
             // Testing the board initialization
             Board board = new Board("Andrey", 10, 10, 10);
 
-
+            Console.WriteLine(BoardPositionStatus.Empty);
 
             Console.ReadKey();
             
