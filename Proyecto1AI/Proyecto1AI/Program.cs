@@ -12,15 +12,24 @@ namespace Proyecto1AI
         static void Main(string[] args)
         {
             // Testing the board initialization
-            Board board = new Board("Andrey", 10, 10, 10);
+            string AgentName = "Andrey";
+            int m = 10;
+            int n = 10;
+            int a = 10;
 
-            int[,] BoardMatrix = new int[4, 4];
+            Board board = new Board(AgentName, m, n , a);
 
-            BoardMatrix[3, 3] = 5;
+            board.Show();
+
+
+
+            int x = Int32.Parse(Console.ReadLine());
+            int y = Int32.Parse(Console.ReadLine());
 
             
 
-
+            board.ChangeAgentGoal(new Tuple<int, int>(x, y));
+            board.Show();
 
             Console.ReadKey();
             
