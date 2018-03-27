@@ -5,3 +5,10 @@ C:\Users\Andrey Mendoza\Documents\Git\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\D
 C:\Users\Andrey Mendoza\Documents\Git\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.csproj.CoreCompileInputs.cache
 C:\Users\Andrey Mendoza\Documents\Git\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.exe
 C:\Users\Andrey Mendoza\Documents\Git\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.pdb
+C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\bin\Debug\Proyecto1AI.exe.config
+C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\bin\Debug\Proyecto1AI.exe
+C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\bin\Debug\Proyecto1AI.pdb
+C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.csprojResolveAssemblyReference.cache
+C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.csproj.CoreCompileInputs.cache
+C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.exe
+C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.pdb
