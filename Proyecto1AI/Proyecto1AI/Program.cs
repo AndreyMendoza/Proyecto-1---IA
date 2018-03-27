@@ -28,8 +28,16 @@ namespace Proyecto1AI
 
             
 
+            board.ChangeAgentPosition(new Tuple<int, int>(x, y));
+
+            x = Int32.Parse(Console.ReadLine());
+            y = Int32.Parse(Console.ReadLine());
+
             board.ChangeAgentGoal(new Tuple<int, int>(x, y));
+
             board.Show();
+
+            board.ShortestPath();
 
             Console.ReadKey();
             
