@@ -16,7 +16,7 @@ namespace Proyecto1AI.Model
         public int[,] BoardMatrix { get; set; }
 
         // Constructor
-        public Board(string AgentName, int ItemSizeIn, int Width, int Height)
+        public Board(string AgentName, int Height, int Width, int ItemSizeIn)
         {
             Agent.Name = AgentName;
             ItemSize = ItemSizeIn;
@@ -147,7 +147,7 @@ namespace Proyecto1AI.Model
         // Generate random obstacles
         private void GenerateRandomObstacles()
         {
-            Double nObstacles = Math.Ceiling(((Size.Item1 + 1) * (Size.Item2 + 1)) * 0.25);
+            Double nObstacles = Math.Ceiling(((Size.Item1 + 1) * (Size.Item2 + 1)) * 0.1);
 
             while (nObstacles > 0)
             {
@@ -255,25 +255,28 @@ namespace Proyecto1AI.Model
         // Calculates the shortest path
         public void ShortestPath()
         {
-            //Keeps the track of each node (Whether already inspected or not)
+            // Keeps the track of each node (Whether already inspected or not)
             var openedNodes = new List<Tuple<int, int, double>>();
             var closedNodes = new List<Tuple<int, int, double>>();
-            //Here, the result of the algorithm  will be saved
+            // Here, the result of the algorithm  will be saved
             var bestRoute = new List<Tuple<int, int, double>>();
-            //Saves the "virtual" position of the agent while the algorithm is running
+            // Saves the "virtual" position of the agent while the algorithm is running
             var actualNode = Agent.Position;
-            //Saves whether keeps serching or not.
-            var alreadyFindedAGoal = false;
-            //Add the initial position to the already opened list
+            // Saves whether keeps serching or not.
+            var alreadyFoundGoal = false;
+            // Add the initial position to the already opened list
             closedNodes.Add(new Tuple<int, int, double>(actualNode.Item1, actualNode.Item2, 0.0));
 
-            while (!alreadyFindedAGoal) {
+            while (!alreadyFoundGoal) {
+
                 //The goal has been reached, it's time to stop :)
-                if (VerifyGoal(actualNode)) {
+                if (VerifyGoal(actualNode))
+                {
                     Console.WriteLine("A valid path was found. YEY!");
-                    alreadyFindedAGoal = true;
+                    alreadyFoundGoal = true;
                     break;
                 }
+
                 //get the adjacent nodes of the actualNode and keeps the f(n) value for every valid node in this iteration
                 var adjacents = GetAdjacents(actualNode);
 
@@ -321,14 +324,16 @@ namespace Proyecto1AI.Model
                 //Select the best node to continue
                 actualNode = new Tuple<int, int>(openedNodes[0].Item1, openedNodes[0].Item2);
                 //Rewrites the best route
-                while (bestRoute.Count>0)
+                while (bestRoute.Count > 0)
                 {
                     //If the new cell is way too far from the last inserted cell in bestRoute, it means that a rollback was made
-                    if (Math.Abs(bestRoute[bestRoute.Count - 1].Item1 - openedNodes[0].Item1) > 1 || Math.Abs(bestRoute[bestRoute.Count - 1].Item2 - openedNodes[0].Item2) > 1){
+                    if (Math.Abs(bestRoute[bestRoute.Count - 1].Item1 - openedNodes[0].Item1) > 1 || Math.Abs(bestRoute[bestRoute.Count - 1].Item2 - openedNodes[0].Item2) > 1)
+                    {
                         bestRoute.RemoveAt(bestRoute.Count - 1);
                     }
                     //The cell could be near, but if the movement wasn't made diagonally, it was 'cuz it was illegal. 
-                    else{
+                    else
+                    {
                         var cellAdjacents = GetAdjacents(new Tuple<int, int>(bestRoute[bestRoute.Count - 1].Item1, bestRoute[bestRoute.Count - 1].Item2));
                         var index = cellAdjacents.FindIndex(t => t.Item1 == openedNodes[0].Item1 && t.Item2 == openedNodes[0].Item2);
                         //The movement was illegal, the traceback keeps going on.
@@ -336,8 +341,9 @@ namespace Proyecto1AI.Model
                         //The movement was legal, it's time to continue.
                         else { break; }
                     }
-                        
+
                 }
+
                 bestRoute.Add(openedNodes[0]);
                 //Now the node is added to the closedNodes list 'cuz it's has been already visited, thus, is deleted from openedNodes list.
                 closedNodes.Add(openedNodes[0]);
@@ -345,9 +351,12 @@ namespace Proyecto1AI.Model
             }
 
             Console.WriteLine("SOLUTION:");
-            foreach (Tuple<int, int, double> i in bestRoute) {
-                Console.WriteLine("(" + i.Item1 + "," + i.Item2 + ") => "+i.Item3);
+            foreach (Tuple<int, int, double> i in bestRoute)
+            {
+                Console.WriteLine("(" + i.Item1 + "," + i.Item2 + ") => " + i.Item3);
+                BoardMatrix[i.Item1, i.Item2] = 5;
             }
+            Show();
             return;
         }
 
@@ -359,15 +368,25 @@ namespace Proyecto1AI.Model
             //Possible movement pattern
             var directions = new List<Tuple<int, int, double>>()
             {
-                    Tuple.Create(+1,-0, 0.0),
-                    Tuple.Create(-1,+0, 0.0),
-                    Tuple.Create(-0,+1, 0.0),
-                    Tuple.Create(+0,-1, 0.0),
-                    Tuple.Create(+1,+1, 1.0),
-                    Tuple.Create(-1,-1, 1.0),
-                    Tuple.Create(+1,-1, 1.0),
-                    Tuple.Create(-1,+1, 1.0)
+                    Tuple.Create(+1, -0, 0.0),
+                    Tuple.Create(-1, +0, 0.0),
+                    Tuple.Create(-0, +1, 0.0),
+                    Tuple.Create(+0, -1, 0.0),
+
+                    //Tuple.Create(+1, +1, 1.0),
+                    //Tuple.Create(-1, -1, 1.0),
+                    //Tuple.Create(+1, -1, 1.0),
+                    //Tuple.Create(-1, +1, 1.0),
             };
+
+            // If Diagonal is active, add it to the adjacents
+            if (IsDiagonal)
+            {
+                directions.Add(new Tuple<int, int, double>(+1, +1, 1.0));
+                directions.Add(new Tuple<int, int, double>(-1, -1, 1.0));
+                directions.Add(new Tuple<int, int, double>(+1, -1, 1.0));
+                directions.Add(new Tuple<int, int, double>(-1, +1, 1.0));
+            }
 
             //Possible movements (Without collision & blocked diagonals)
             var adjacents = new List<Tuple<int, int, double>>();
@@ -378,7 +397,7 @@ namespace Proyecto1AI.Model
             {
                 var adjacent = new Tuple<int, int>(cell.Item1 + i.Item1, cell.Item2 + i.Item2);
                 //Does not exclude the GOAL node if is found
-                if (IsValidMovement(adjacent)||VerifyGoal(adjacent))
+                if (IsValidMovement(adjacent) || VerifyGoal(adjacent))
                 {
                     adjacents.Add(new Tuple<int, int, double>(cell.Item1 + i.Item1, cell.Item2 + i.Item2, i.Item3));
                 }
@@ -387,8 +406,10 @@ namespace Proyecto1AI.Model
                 }
             }
             //Deletes the blocked diagonals from the valid adjacents
-            foreach(Tuple < int, int > invalid in invalidAdjacents) {
-                for (int limit = 0; limit< 4; limit++) {
+            foreach(Tuple < int, int > invalid in invalidAdjacents)
+            {
+                for (int limit = 0; limit < 4; limit++)
+                {
                     //Takes the invalid adjacents and sizes up the posible invalid diagonals 
                     var excluded = new Tuple<int, int>(directions[limit].Item1 + invalid.Item1, directions[limit].Item2 + invalid.Item2);
 
@@ -396,10 +417,8 @@ namespace Proyecto1AI.Model
                     //If excluded cell shares a side (top,bottom,right or left) with a diagonal of the actual position, it is deleted.
                     if (index > -1 && adjacents[index].Item3>0) { adjacents.RemoveAt(index); }
                 }
-
             }
             return adjacents;
-
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -414,12 +433,15 @@ namespace Proyecto1AI.Model
             foreach (Tuple<int, int, double> i in paths)
             {
                 //Sizes the heuristic up
-                var heuristic = (Math.Abs(Agent.Goal.Item1 - i.Item1) + Math.Abs(Agent.Goal.Item2 - i.Item2))*10;
+                var heuristic = (Math.Abs(Agent.Goal.Item1 - i.Item1) + Math.Abs(Agent.Goal.Item2 - i.Item2)) * 10;
 
                 //Sums the cost up
                 var cost = 0.0;
-                if (i.Item3 == 0.0) { cost = cathetus; }
-                else { cost = hypotenuse; }
+
+                if (i.Item3 == 0.0)
+                    cost = cathetus;
+                else
+                    cost = hypotenuse;
 
                 //Inserts the sized up path
                 result.Add(new Tuple<int, int, double>(i.Item1, i.Item2, heuristic + cost));
@@ -432,7 +454,9 @@ namespace Proyecto1AI.Model
         // Verifies if the cell is already the goal.
         public bool VerifyGoal(Tuple<int,int> cell)
         {
-            if (cell.Item1 == Agent.Goal.Item1 && cell.Item2 == Agent.Goal.Item2) { return true; }
+            if (cell.Item1 == Agent.Goal.Item1 && cell.Item2 == Agent.Goal.Item2)            
+                return true;
+
             return false;
         }
 

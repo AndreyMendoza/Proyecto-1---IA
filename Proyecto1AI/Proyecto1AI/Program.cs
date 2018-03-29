@@ -13,12 +13,22 @@ namespace Proyecto1AI
         {
             // Testing the board initialization
             string AgentName = "Andrey";
-            int m = 10;
-            int n = 10;
-            int a = 10;
+            int m = 5;
+            int n = 5;
+            int a = 100;
 
             Board board = new Board(AgentName, m, n , a);
 
+            int[,] b = new int[5, 5] {  {2, 0, 1, 0, 3},
+                                        {0, 1, 1, 0, 0},
+                                        {0, 0, 1, 0, 0},
+                                        {0, 0, 1, 0, 0},
+                                        {0, 0, 0, 0, 1}};
+
+            board.BoardMatrix = b;
+            board.Agent.Position = new Tuple<int, int>(0,0);
+            board.Agent.Goal = new Tuple<int, int>(0, 4);
+            board.IsDiagonal = true;
             board.Show();
 
 
