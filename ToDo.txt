@@ -1,0 +1,18 @@
+1) Toma de parámetros
+	- Tamanho de la matriz
+	- Obstáculos
+	- EsDiagonal
+	- Posición de inicio
+	- Tamanho de los cuadros
+	- Posición de destino
+	- Limpiar
+2) Armar la Matriz
+3) Aplicar Movimiento del bichito
+4) Algoritmo A*
+5) Toma de comandos por voz
+6) GUI
+
+
+
+
+LUIS API
