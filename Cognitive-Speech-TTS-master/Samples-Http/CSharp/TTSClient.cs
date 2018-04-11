@@ -278,11 +278,11 @@ namespace CognitiveServicesTTS
             client = new HttpClient(handler);
         }
 
-        ~Synthesize()
-        {
-            client.Dispose();
-            handler.Dispose();
-        }
+        //~Synthesize()
+        //{
+        //    client.Dispose();
+        //    handler.Dispose();
+        //}
 
         /// <summary>
         /// Called when a TTS request has been completed and audio is available.
