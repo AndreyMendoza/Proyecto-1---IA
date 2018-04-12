@@ -1,7 +1,10 @@
 ﻿using Microsoft.CognitiveServices.SpeechRecognition;
 using System.Configuration;
 using System;
-using Proyecto1AI.Controller;
+using System.Media;
+using System.IO;
+using System.Threading;
+using Proyecto1AI.Model;
 
 namespace Proyecto1AI.Controller
 {
@@ -11,6 +14,7 @@ namespace Proyecto1AI.Controller
         private string RecognitionLanguage;
         private string LuisEndpointURL;
         private string SpeechAPISubscriptionKey;
+        Authentication AuthorizationToken;
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -21,6 +25,7 @@ namespace Proyecto1AI.Controller
             RecognitionLanguage = ConfigurationManager.AppSettings["RecognitionLanguage"];
             LuisEndpointURL = ConfigurationManager.AppSettings["LuisEndpointURL"];
             SpeechAPISubscriptionKey = ConfigurationManager.AppSettings["SpeechAPISubscriptionKey"];
+            AuthorizationToken = new Authentication();
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -128,5 +133,42 @@ namespace Proyecto1AI.Controller
             Microphone.StartMicAndRecognition();
 
         }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+        
+        // Handler that conert from text to voice and reproduce it
+        public static void PlayAudio(object sender, GenericEventArgs<Stream> args)
+        {
+            SoundPlayer player = new SoundPlayer(args.EventData);
+            player.PlaySync();
+            args.EventData.Dispose();
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Handler to manage errors during the process of TTS
+        private static void ErrorHandler(object sender, GenericEventArgs<Exception> e)
+        {
+            Console.WriteLine("Unable to complete the TTS request: [{0}]", e.ToString());
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Send the text to the API in order to generate the WAV file to reproduce
+        public void TextToSpeech(string InputText)
+        {
+            Synthesize Cortana = new Synthesize();
+
+            Cortana.OnAudioAvailable += PlayAudio;
+            Cortana.OnError += ErrorHandler;
+
+            // Reuse Synthesize object to minimize latency
+            Cortana.Speak(CancellationToken.None, new InputOptions()
+            {
+                Text = InputText,
+                AuthorizationToken = "Bearer " + AuthorizationToken.AccessToken,
+            }).Wait();
+        }
+
     }
 }

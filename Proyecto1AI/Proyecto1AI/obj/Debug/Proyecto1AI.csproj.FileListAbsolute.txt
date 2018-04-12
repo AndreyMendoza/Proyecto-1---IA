@@ -12,3 +12,4 @@ C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto
 C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.csproj.CoreCompileInputs.cache
 C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.exe
 C:\Users\kevin\Desktop\Proyectos\redcuidocr\IA\Proyecto1-IA\Proyecto1AI\Proyecto1AI\obj\Debug\Proyecto1AI.pdb
+C:\Users\Andrey Mendoza\Documents\Git\Proyecto1-IA\Proyecto1AI\Proyecto1AI\bin\Debug\SpeechClient.dll

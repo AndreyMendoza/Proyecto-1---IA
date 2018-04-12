@@ -26,6 +26,7 @@ namespace Proyecto1AI.Model
             RecognitionLanguage = ConfigurationManager.AppSettings["RecognitionLanguage"];
             OutputFormat = ConfigurationManager.AppSettings["OutputFormat"];
             VoiceName = ConfigurationManager.AppSettings["VoiceName"];
+            RequestUri = new Uri(ConfigurationManager.AppSettings["SynthesizeURI"]);
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------

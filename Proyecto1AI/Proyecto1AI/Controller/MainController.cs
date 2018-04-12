@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿using Proyecto1AI.Controller;
+using System.IO;
+using System.Media;
+using System.Threading;
 
 namespace Proyecto1AI.Model
 {
@@ -23,8 +26,10 @@ namespace Proyecto1AI.Model
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
+
         
-        
+
+
 
     }
 }
