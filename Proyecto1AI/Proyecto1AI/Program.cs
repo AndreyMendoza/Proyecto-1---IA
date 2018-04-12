@@ -4,14 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Proyecto1AI.View;
 
 namespace Proyecto1AI
 {
     class Program
     {
-        static void Main(string[] args)
+
+        static void Main()
         {
+            Board board = new Board("Paché", 5, 5, 5);
+            principalWindown principalWindown = new principalWindown();
+
+            Console.Write(board.BoardMatrix);
+
+
+            principalWindown.ShowDialog();
+
             // Testing the board initialization
+            /*
             string AgentName = "Andrey";
             int m = 5;
             int n = 5;
@@ -50,7 +61,8 @@ namespace Proyecto1AI
             board.ShortestPath();
 
             Console.ReadKey();
-            
+            */
+
         }
     }
 }
