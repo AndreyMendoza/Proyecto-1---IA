@@ -77,12 +77,14 @@ namespace Proyecto1AI.View
         }
 
         private void DrawBestPath() {
+            var path = board.ShortestPath();
 
-            foreach (Tuple<int, int, double> i in board.ShortestPath())
+            while (path!=null)
             {
-                if (board.BoardMatrix[i.Item1, i.Item2] == 0) {
-                    UpDateMatrix(i.Item1, i.Item2, 4);
+                if (board.BoardMatrix[path.X, path.Y] == 0) {
+                    UpDateMatrix(path.X, path.Y, 4);
                 }
+                path = path.Parent;
             }
 
 

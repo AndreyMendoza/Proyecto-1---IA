@@ -61,6 +61,7 @@
     <Compile Include="Controller\MainController.cs" />
     <Compile Include="Model\BoardPositionStatus.cs" />
     <Compile Include="Model\AgentMovement.cs" />
+    <Compile Include="Model\Node.cs" />
     <Compile Include="Model\InputOptions.cs" />
     <Compile Include="Model\VoiceGender.cs" />
     <Compile Include="Program.cs" />

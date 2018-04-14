@@ -10,7 +10,7 @@ namespace Proyecto1AI.Model
     {
         public List<BoardItem> Obstacles { get; set; } = new List<BoardItem>();
         public Agent Agent { get; set; } = new Agent();
-        public bool IsDiagonal = false;
+        public bool IsDiagonal = true;
         public Tuple<int, int> Size { get; set; }
         public int ItemSize { get; set; }
         public int[,] BoardMatrix { get; set; }
@@ -48,16 +48,16 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Add an obstacle to the board
-        public bool AddObstacle(Tuple<int, int> NewPosition)
+        public bool AddObstacle(Node NewPosition)
         {
             if (IsValidMovement(NewPosition))
             {
                 BoardItem NewObstacle = new BoardItem
                 {
-                    Position = NewPosition,
+                    Position = new Tuple<int,int>(NewPosition.X, NewPosition.Y),
                     Path = "ruta"
                 };
-                BoardMatrix[NewPosition.Item1, NewPosition.Item2] = (int)BoardPositionStatus.Obstacle;
+                BoardMatrix[NewPosition.X, NewPosition.Y] = (int)BoardPositionStatus.Obstacle;
                 Obstacles.Add(NewObstacle);
 
                 return true;
@@ -90,13 +90,13 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Changes Agent's Position
-        public bool ChangeAgentPosition(Tuple<int, int> Position)
+        public bool ChangeAgentPosition(Node Position)
         {
             // Updates the board with the Agent's position
             if (IsValidMovement(Position))
             {
                 BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = (int)BoardPositionStatus.Empty;
-                Agent.Position = Position;
+                Agent.Position = new Tuple<int,int>(Position.X,Position.Y);
                 BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = (int)BoardPositionStatus.Agent;
 
                 return true;
@@ -107,13 +107,13 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Changes Agent's goal position
-        public bool ChangeAgentGoal(Tuple<int, int> Position)
+        public bool ChangeAgentGoal(Node Position)
         {
             // Updates the board with the Agent's position
             if (IsValidMovement(Position))
             {
                 BoardMatrix[Agent.Goal.Item1, Agent.Goal.Item2] = (int)BoardPositionStatus.Empty;
-                Agent.Goal = Position;
+                Agent.Goal = new Tuple<int,int>(Position.X, Position.Y);
                 BoardMatrix[Agent.Goal.Item1, Agent.Goal.Item2] = (int)BoardPositionStatus.AgentGoal;
 
                 return true;
@@ -147,7 +147,7 @@ namespace Proyecto1AI.Model
         // Generate random obstacles
         private void GenerateRandomObstacles()
         {
-            Double nObstacles = Math.Ceiling(((Size.Item1 + 1) * (Size.Item2 + 1)) * 0.1);
+            Double nObstacles = Math.Ceiling(((Size.Item1 + 1) * (Size.Item2 + 1)) * 0.5);
 
             while (nObstacles > 0)
             {
@@ -185,13 +185,13 @@ namespace Proyecto1AI.Model
         // Moves the agent in the board if possible
         public bool MoveAgent(AgentMovement Direction)
         {
-            Tuple<int, int> MovementPosition = CreateMovement(Direction);
+            Node MovementPosition = CreateMovement(Direction);
 
             // Updates the board with the Agent's position
             if (IsValidMovement(MovementPosition))
             {
                 BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = (int)BoardPositionStatus.Empty;
-                Agent.Position = MovementPosition;
+                Agent.Position = new Tuple<int,int>(MovementPosition.X, MovementPosition.Y);
                 BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = (int)BoardPositionStatus.Agent;
 
                 return true;
@@ -202,36 +202,36 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Generate the new position tuple from the actual position
-        public Tuple<int, int> CreateMovement(AgentMovement Direction)
+        public Node CreateMovement(AgentMovement Direction)
         {
-            Tuple<int, int> MovementPosition = new Tuple<int, int>(-1, -1);
+            Node MovementPosition = new Node { };
 
             // Create the tuple with the goal direction
             switch (Direction)
             {
                 case AgentMovement.Up:
-                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 - 1, Agent.Position.Item2);
+                    MovementPosition = new Node { X = Agent.Position.Item1 - 1, Y = Agent.Position.Item2 };
                     break;
                 case AgentMovement.Down:
-                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 + 1, Agent.Position.Item2);
+                    MovementPosition = new Node { X = Agent.Position.Item1 + 1, Y = Agent.Position.Item2 };
                     break;
                 case AgentMovement.Right:
-                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1, Agent.Position.Item2 + 1);
+                    MovementPosition = new Node { X = Agent.Position.Item1, Y = Agent.Position.Item2 + 1 };
                     break;
                 case AgentMovement.Left:
-                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1, Agent.Position.Item2 - 1);
+                    MovementPosition = new Node { X = Agent.Position.Item1, Y = Agent.Position.Item2 - 1 };
                     break;
                 case AgentMovement.UpRight:
-                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 - 1, Agent.Position.Item2 + 1);
+                    MovementPosition = new Node { X = Agent.Position.Item1 - 1, Y = Agent.Position.Item2 + 1 };
                     break;
                 case AgentMovement.UpLeft:
-                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 - 1, Agent.Position.Item2 - 1);
+                    MovementPosition = new Node { X = Agent.Position.Item1 - 1, Y = Agent.Position.Item2 - 1 };
                     break;
                 case AgentMovement.DownRight:
-                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 + 1, Agent.Position.Item2 + 1);
+                    MovementPosition = new Node { X = Agent.Position.Item1 + 1, Y = Agent.Position.Item2 + 1 };
                     break;
                 case AgentMovement.DownLeft:
-                    MovementPosition = new Tuple<int, int>(Agent.Position.Item1 + 1, Agent.Position.Item2 - 1);
+                    MovementPosition = new Node { X = Agent.Position.Item1 + 1, Y = Agent.Position.Item2 - 1 };
                     break;
             }
 
@@ -241,10 +241,10 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Verifies if a movement is valid
-        public bool IsValidMovement(Tuple<int, int> Goal)
+        public bool IsValidMovement(Node Goal)
         {
-            if ((0 <= Goal.Item1 && Goal.Item1 <= Size.Item1) && (0 <= Goal.Item2 && Goal.Item2 <= Size.Item2)
-                && BoardMatrix[Goal.Item1, Goal.Item2] == (int)BoardPositionStatus.Empty)
+            if ((0 <= Goal.X && Goal.X <= Size.Item1) && (0 <= Goal.Y && Goal.Y <= Size.Item2)
+                && BoardMatrix[Goal.X, Goal.Y] == (int)BoardPositionStatus.Empty)
                 return true;
             else
                 return false;
@@ -253,28 +253,27 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Calculates the shortest path
-        public List<Tuple<int, int, double>> ShortestPath()
+        public Node ShortestPath()
         {
             // Keeps the track of each node (Whether already inspected or not)
-            var openedNodes = new List<Tuple<int, int, double>>();
-            var closedNodes = new List<Tuple<int, int, double>>();
+            var openedNodes = new List<Node>();
+            var closedNodes = new List<Node>();
             // Here, the result of the algorithm  will be saved
-            var bestRoute = new List<Tuple<int, int, double>>();
+            var bestRoute = new List<Node>();
             // Saves the "virtual" position of the agent while the algorithm is running
-            var actualNode = Agent.Position;
+            var actualNode = new Node { X = Agent.Position.Item1, Y = Agent.Position.Item2 };
             // Saves whether keeps serching or not.
             var alreadyFoundGoal = false;
             // Add the initial position to the already opened list
-            closedNodes.Add(new Tuple<int, int, double>(actualNode.Item1, actualNode.Item2, 0.0));
+            closedNodes.Add(actualNode);
+
 
             while (!alreadyFoundGoal) {
 
                 //The goal has been reached, it's time to stop :)
                 if (VerifyGoal(actualNode))
                 {
-                    Console.WriteLine("A valid path was found. YEY!");
-                    alreadyFoundGoal = true;
-                    break;
+                    actualNode.solution = true;
                 }
 
                 //get the adjacent nodes of the actualNode and keeps the f(n) value for every valid node in this iteration
@@ -284,17 +283,23 @@ namespace Proyecto1AI.Model
                 adjacents = AStar(adjacents);
 
                 //Verifies if i has already been opened or closed
-                foreach(Tuple < int, int, double> i in adjacents)
+                foreach(Node i in adjacents)
                 {
-                    int index;
-                    index = openedNodes.FindIndex(t => t.Item1 == i.Item1 && t.Item2 == i.Item2);
+                    double parent = 0.0;
+                    if (bestRoute.Count > 0) {
+                        parent = bestRoute[bestRoute.Count - 1].H;
+                    }
+                    int index = openedNodes.FindIndex(t => t.X == i.X && t.Y == i.Y);
                     //Looks if the found cell has been already opened
                     if (index > -1)
                     {
                         //If so, looks if the new one is a better choice
-                        if (i.Item3 < openedNodes[index].Item3)
+                        if (i.H < openedNodes[index].H)
                         {
                             //Yes, it is, so now is added to the openedNodes list 
+                            i.Parent = actualNode;
+                            i.H = i.H + actualNode.H;
+                            i.index += 1;
                             openedNodes.Add(i);
                         }
                         else
@@ -307,14 +312,17 @@ namespace Proyecto1AI.Model
                     }
                     else {
                         //Now looks if the found cell has a spot in the closedNodes list
-                        index = closedNodes.FindIndex(t => t.Item1 == i.Item1 && t.Item2 == i.Item2);
+                        index = closedNodes.FindIndex(t => t.X == i.X && t.Y == i.Y);
                         if (index < 0) {
                             //If not, it's added to the openedNodes list
+                            i.Parent = actualNode;
+                            i.H = i.H + actualNode.H;
+                            i.index += 1;
                             openedNodes.Add(i);
                         }
                     }
                     //Now, the list is sorted in order to have the best choice at index 0
-                    openedNodes = openedNodes.OrderBy(t => t.Item3).ToList();
+                    openedNodes = openedNodes.OrderBy(t => t.H).ToList();
                 }
                 //There are no more options, it's time to stop :(
                 if (openedNodes.Count() == 0) {
@@ -322,41 +330,27 @@ namespace Proyecto1AI.Model
                     break;
                 }
                 //Select the best node to continue
-                actualNode = new Tuple<int, int>(openedNodes[0].Item1, openedNodes[0].Item2);
-                //Rewrites the best route
-                while (bestRoute.Count > 0)
-                {
-                    //If the new cell is way too far from the last inserted cell in bestRoute, it means that a rollback was made
-                    if (Math.Abs(bestRoute[bestRoute.Count - 1].Item1 - openedNodes[0].Item1) > 1 || Math.Abs(bestRoute[bestRoute.Count - 1].Item2 - openedNodes[0].Item2) > 1)
-                    {
-                        bestRoute.RemoveAt(bestRoute.Count - 1);
-                    }
-                    //The cell could be near, but if the movement wasn't made diagonally, it was 'cuz it was illegal. 
-                    else
-                    {
-                        var cellAdjacents = GetAdjacents(new Tuple<int, int>(bestRoute[bestRoute.Count - 1].Item1, bestRoute[bestRoute.Count - 1].Item2));
-                        var index = cellAdjacents.FindIndex(t => t.Item1 == openedNodes[0].Item1 && t.Item2 == openedNodes[0].Item2);
-                        //The movement was illegal, the traceback keeps going on.
-                        if (index < 0) { bestRoute.RemoveAt(bestRoute.Count - 1); }
-                        //The movement was legal, it's time to continue.
-                        else { break; }
-                    }
-
-                }
+                actualNode = openedNodes[0];
 
                 bestRoute.Add(openedNodes[0]);
                 //Now the node is added to the closedNodes list 'cuz it's has been already visited, thus, is deleted from openedNodes list.
                 closedNodes.Add(openedNodes[0]);
                 openedNodes.RemoveAt(0);
             }
-           
-            return bestRoute;
+
+            bestRoute.OrderBy(t => t.index).ToList();
+            foreach (Node node in bestRoute) {
+                if (node.solution == true) {
+                    return node;
+                }
+            }
+            return null;
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         //Calculates the adjacent nodes of a cell
-        public List<Tuple<int, int, double>> GetAdjacents(Tuple<int, int> cell)
+        public List<Node> GetAdjacents(Node cell)
         {
             //Possible movement pattern
             var directions = new List<Tuple<int, int, double>>()
@@ -377,20 +371,15 @@ namespace Proyecto1AI.Model
             }
 
             //Possible movements (Without collision & blocked diagonals)
-            var adjacents = new List<Tuple<int, int, double>>();
+            var adjacents = new List<Node>();
             //Used to dertermine the blocked diagonals
-            var invalidAdjacents = new List<Tuple<int, int>>();
-            //Movements without collitions
             foreach (Tuple<int, int, double> i in directions)
             {
-                var adjacent = new Tuple<int, int>(cell.Item1 + i.Item1, cell.Item2 + i.Item2);
+                var adjacent = new Node { X = cell.X + i.Item1, Y = cell.Y + i.Item2, H = i.Item3 };
                 //Does not exclude the GOAL node if is found
                 if (IsValidMovement(adjacent) || VerifyGoal(adjacent))
                 {
-                    adjacents.Add(new Tuple<int, int, double>(cell.Item1 + i.Item1, cell.Item2 + i.Item2, i.Item3));
-                }
-                else {
-                    invalidAdjacents.Add(new Tuple<int, int>(adjacent.Item1, adjacent.Item2));
+                    adjacents.Add(adjacent);
                 }
             }
             return adjacents;
@@ -399,27 +388,28 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         //Calculates f(n)=h(n)+g(n) 
-        public List<Tuple<int, int, double>> AStar(List<Tuple<int, int, double>> paths)
+        public List<Node> AStar(List<Node> paths)
         {
-            var result = new List<Tuple<int, int, double>>();
+            var result = new List<Node>();
             var cathetus = ItemSize;
             var hypotenuse = Math.Sqrt(2 * (cathetus * cathetus));
 
-            foreach (Tuple<int, int, double> i in paths)
+            foreach (Node i in paths)
             {
                 //Sizes the heuristic up
-                var heuristic = (Math.Abs(Agent.Goal.Item1 - i.Item1) + Math.Abs(Agent.Goal.Item2 - i.Item2)) * 10;
+                var heuristic = (Math.Abs(Agent.Goal.Item1 - i.X) + Math.Abs(Agent.Goal.Item2 - i.Y)) * 10;
 
                 //Sums the cost up
                 var cost = 0.0;
 
-                if (i.Item3 == 0.0)
+                if (i.H == 0.0)
                     cost = cathetus;
                 else
                     cost = hypotenuse;
 
                 //Inserts the sized up path
-                result.Add(new Tuple<int, int, double>(i.Item1, i.Item2, heuristic + cost));
+                i.H = heuristic + cost;
+                result.Add(i);
             }
             return result;
         }
@@ -427,9 +417,9 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Verifies if the cell is already the goal.
-        public bool VerifyGoal(Tuple<int,int> cell)
+        public bool VerifyGoal(Node cell)
         {
-            if (cell.Item1 == Agent.Goal.Item1 && cell.Item2 == Agent.Goal.Item2)            
+            if (cell.X == Agent.Goal.Item1 && cell.Y == Agent.Goal.Item2)            
                 return true;
 
             return false;
