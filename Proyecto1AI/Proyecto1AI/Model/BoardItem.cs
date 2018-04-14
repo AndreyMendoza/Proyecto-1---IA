@@ -9,6 +9,5 @@ namespace Proyecto1AI.Model
     class BoardItem
     {
         public Tuple<int, int> Position { get; set; }
-        public string Path { get; set; }
     }
 }

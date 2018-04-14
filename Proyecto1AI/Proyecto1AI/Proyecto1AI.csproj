@@ -120,6 +120,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\agua.png" />
+    <None Include="Resources\IAOK.png" />
+    <None Include="Resources\IABad.png" />
+    <None Include="Resources\goalOK.png" />
+    <None Include="Resources\goalBad.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

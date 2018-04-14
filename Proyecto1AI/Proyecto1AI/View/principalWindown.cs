@@ -16,12 +16,14 @@ namespace Proyecto1AI.View
 
     public partial class principalWindown : Form
     {
-        Board board = new Board("Paché", 15, 7, 5);
+        Board board = new Board("Paché", 17, 7, 5);
+        Boolean showingPath = false;
+        PictureBox [,] visualBoard = new PictureBox[7,17];
+        Node lastPath;
 
         public principalWindown()
         {
             InitializeComponent();
-            DrawBestPath();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -31,10 +33,12 @@ namespace Proyecto1AI.View
                 {
                     for (int j = 0; j < board.Size.Item2+1; j++)
                     {
+                        visualBoard[i, j] = new PictureBox();
                         UpDateMatrix(i, j, board.BoardMatrix[i, j]);
                     }
                 }
             }
+            
         }
 
         private System.Drawing.Bitmap getAsset(int terrainType) {
@@ -59,41 +63,100 @@ namespace Proyecto1AI.View
                     return Resources.IA;
                 case 3:
                     return Resources.goal;
+                case 4:
+                    return Resources.IAOK;
+                case 5:
+                    return Resources.goalOK;
+                case 6:
+                    return Resources.IABad;
+                case 7:
+                    return Resources.goalBad;
 
             }
             return Resources.path; ;
         }
 
 
-        private void UpDateMatrix(int i, int j, int terrainType)
+        public void UpDateMatrix(int i, int j, int terrainType)
         {
-            PictureBox pictureBox = new PictureBox();
-            pictureBox.Image = getAsset(terrainType);
-            pictureBox.Location = new System.Drawing.Point(j * 75 + 75, i * 75 + 75);
-            pictureBox.Size = new System.Drawing.Size(75, 75);
-            pictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-            boardPanel.Controls.Add(pictureBox);
+            visualBoard[i, j].Image = getAsset(terrainType);
+            visualBoard[i, j].Location = new System.Drawing.Point(j * 75 + 75, i * 75 + 75);
+            visualBoard[i, j].Size = new System.Drawing.Size(75, 75);
+            visualBoard[i, j].SizeMode = PictureBoxSizeMode.StretchImage;
+            visualBoard[i, j].Paint += new PaintEventHandler((sender, e) =>
+            {
+                e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                e.Graphics.DrawString("["+i.ToString()+","+j.ToString()+"]", new Font("Arial", 10, FontStyle.Bold), Brushes.Black, 0, 0);
+            });
+            boardPanel.Controls.Add(visualBoard[i, j]);
 
         }
 
-        private void DrawBestPath() {
-            var path = board.ShortestPath();
+        public void DrawBestPath() {
 
-            while (path!=null)
+            Node actualPath = board.ShortestPath();
+            lastPath = actualPath;
+
+            if (actualPath == null)
             {
-                if (board.BoardMatrix[path.X, path.Y] == 0) {
-                    UpDateMatrix(path.X, path.Y, 4);
-                }
-                path = path.Parent;
+                UpDateMatrix(board.Agent.Position.Item1, board.Agent.Position.Item2, 6);
+                UpDateMatrix(board.Agent.Goal.Item1, board.Agent.Goal.Item2, 7);
+            }
+            else {
+                UpDateMatrix(board.Agent.Position.Item1, board.Agent.Position.Item2, 4);
+                UpDateMatrix(board.Agent.Goal.Item1, board.Agent.Goal.Item2, 5);
             }
 
+            while (actualPath != null)
+            {
+                if (board.BoardMatrix[actualPath.X, actualPath.Y] == 0) {
+                    UpDateMatrix(actualPath.X, actualPath.Y, 8);
+                }
+                actualPath = actualPath.Parent;
+            }
+
+            showingPath = true;
+
+        }
+
+        public void CleanPath()
+        {
+
+            if (showingPath == true) {
+                
+                lastPath = board.ShortestPath();
+                UpDateMatrix(board.Agent.Position.Item1, board.Agent.Position.Item2, 2);
+                UpDateMatrix(board.Agent.Goal.Item1, board.Agent.Goal.Item2, 3);
+            
+
+                while (lastPath != null)
+                {
+                    if (board.BoardMatrix[lastPath.X, lastPath.Y] == 0)
+                    {
+                        UpDateMatrix(lastPath.X, lastPath.Y, 0);
+                    }
+                    lastPath = lastPath.Parent;
+                }
+            }
+            showingPath = false;
 
         }
 
 
-            private void boardPanel_Paint(object sender, PaintEventArgs e)
+        private void boardPanel_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DrawBestPath();
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            CleanPath();
         }
     }
 }

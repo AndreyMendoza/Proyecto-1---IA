@@ -41,8 +41,6 @@ namespace Proyecto1AI.Model
             // Goal Position
             Agent.Goal = RandomBoardPosition();
             BoardMatrix[Agent.Goal.Item1, Agent.Goal.Item2] = (int)BoardPositionStatus.AgentGoal;
-
-            Agent.Path = "Sonrisas.png";  
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -55,7 +53,6 @@ namespace Proyecto1AI.Model
                 BoardItem NewObstacle = new BoardItem
                 {
                     Position = new Tuple<int,int>(NewPosition.X, NewPosition.Y),
-                    Path = "ruta"
                 };
                 BoardMatrix[NewPosition.X, NewPosition.Y] = (int)BoardPositionStatus.Obstacle;
                 Obstacles.Add(NewObstacle);
@@ -147,7 +144,7 @@ namespace Proyecto1AI.Model
         // Generate random obstacles
         private void GenerateRandomObstacles()
         {
-            Double nObstacles = Math.Ceiling(((Size.Item1 + 1) * (Size.Item2 + 1)) * 0.5);
+            Double nObstacles = Math.Ceiling(((Size.Item1 + 1) * (Size.Item2 + 1)) * 0.2);
 
             while (nObstacles > 0)
             {
@@ -155,7 +152,6 @@ namespace Proyecto1AI.Model
                 BoardItem NewObstacle = new BoardItem
                 {
                     Position = position,
-                    Path = "ruta"
                 };
                 BoardMatrix[position.Item1, position.Item2] = (int)BoardPositionStatus.Obstacle;
                 Obstacles.Add(NewObstacle);
@@ -267,13 +263,13 @@ namespace Proyecto1AI.Model
             // Add the initial position to the already opened list
             closedNodes.Add(actualNode);
 
-
             while (!alreadyFoundGoal) {
 
                 //The goal has been reached, it's time to stop :)
                 if (VerifyGoal(actualNode))
                 {
                     actualNode.solution = true;
+                    //break;
                 }
 
                 //get the adjacent nodes of the actualNode and keeps the f(n) value for every valid node in this iteration
@@ -285,10 +281,6 @@ namespace Proyecto1AI.Model
                 //Verifies if i has already been opened or closed
                 foreach(Node i in adjacents)
                 {
-                    double parent = 0.0;
-                    if (bestRoute.Count > 0) {
-                        parent = bestRoute[bestRoute.Count - 1].H;
-                    }
                     int index = openedNodes.FindIndex(t => t.X == i.X && t.Y == i.Y);
                     //Looks if the found cell has been already opened
                     if (index > -1)
@@ -299,7 +291,7 @@ namespace Proyecto1AI.Model
                             //Yes, it is, so now is added to the openedNodes list 
                             i.Parent = actualNode;
                             i.H = i.H + actualNode.H;
-                            i.index += 1;
+                            i.index = actualNode.index + 1;
                             openedNodes.Add(i);
                         }
                         else
@@ -317,7 +309,7 @@ namespace Proyecto1AI.Model
                             //If not, it's added to the openedNodes list
                             i.Parent = actualNode;
                             i.H = i.H + actualNode.H;
-                            i.index += 1;
+                            i.index = actualNode.index+1;
                             openedNodes.Add(i);
                         }
                     }
@@ -326,7 +318,6 @@ namespace Proyecto1AI.Model
                 }
                 //There are no more options, it's time to stop :(
                 if (openedNodes.Count() == 0) {
-                    Console.WriteLine("No valid path was found :(");
                     break;
                 }
                 //Select the best node to continue
@@ -337,10 +328,11 @@ namespace Proyecto1AI.Model
                 closedNodes.Add(openedNodes[0]);
                 openedNodes.RemoveAt(0);
             }
-
+            //Special case that can be avoided with the break;
             bestRoute.OrderBy(t => t.index).ToList();
             foreach (Node node in bestRoute) {
                 if (node.solution == true) {
+                    Console.WriteLine(node.index);
                     return node;
                 }
             }
@@ -397,7 +389,7 @@ namespace Proyecto1AI.Model
             foreach (Node i in paths)
             {
                 //Sizes the heuristic up
-                var heuristic = (Math.Abs(Agent.Goal.Item1 - i.X) + Math.Abs(Agent.Goal.Item2 - i.Y)) * 10;
+                var heuristic = (Math.Abs(Agent.Goal.Item1 - i.X) + Math.Abs(Agent.Goal.Item2 - i.Y))*100;
 
                 //Sums the cost up
                 var cost = 0.0;
@@ -427,16 +419,6 @@ namespace Proyecto1AI.Model
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
-        // Print the Board in console
-        public void Show()
-        {
-            Console.WriteLine("\n----------------------------------------------\n");
-            for (int i = 0; i <= Size.Item1; i++)
-            {
-                for (int j = 0; j <= Size.Item2; j++)
-                    Console.Write("{0} ",BoardMatrix[i, j]);
-                Console.WriteLine();
-            }
-        }
+
     }
 }
