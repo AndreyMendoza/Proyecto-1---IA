@@ -21,6 +21,7 @@ namespace Proyecto1AI.View
         public principalWindown()
         {
             InitializeComponent();
+            DrawBestPath();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -76,6 +77,13 @@ namespace Proyecto1AI.View
         }
 
         private void DrawBestPath() {
+
+            foreach (Tuple<int, int, double> i in board.ShortestPath())
+            {
+                if (board.BoardMatrix[i.Item1, i.Item2] == 0) {
+                    UpDateMatrix(i.Item1, i.Item2, 4);
+                }
+            }
 
 
         }

@@ -253,7 +253,7 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Calculates the shortest path
-        public void ShortestPath()
+        public List<Tuple<int, int, double>> ShortestPath()
         {
             // Keeps the track of each node (Whether already inspected or not)
             var openedNodes = new List<Tuple<int, int, double>>();
@@ -349,15 +349,8 @@ namespace Proyecto1AI.Model
                 closedNodes.Add(openedNodes[0]);
                 openedNodes.RemoveAt(0);
             }
-
-            Console.WriteLine("SOLUTION:");
-            foreach (Tuple<int, int, double> i in bestRoute)
-            {
-                Console.WriteLine("(" + i.Item1 + "," + i.Item2 + ") => " + i.Item3);
-                BoardMatrix[i.Item1, i.Item2] = 5;
-            }
-            Show();
-            return;
+           
+            return bestRoute;
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -372,11 +365,6 @@ namespace Proyecto1AI.Model
                     Tuple.Create(-1, +0, 0.0),
                     Tuple.Create(-0, +1, 0.0),
                     Tuple.Create(+0, -1, 0.0),
-
-                    //Tuple.Create(+1, +1, 1.0),
-                    //Tuple.Create(-1, -1, 1.0),
-                    //Tuple.Create(+1, -1, 1.0),
-                    //Tuple.Create(-1, +1, 1.0),
             };
 
             // If Diagonal is active, add it to the adjacents
@@ -403,19 +391,6 @@ namespace Proyecto1AI.Model
                 }
                 else {
                     invalidAdjacents.Add(new Tuple<int, int>(adjacent.Item1, adjacent.Item2));
-                }
-            }
-            //Deletes the blocked diagonals from the valid adjacents
-            foreach(Tuple < int, int > invalid in invalidAdjacents)
-            {
-                for (int limit = 0; limit < 4; limit++)
-                {
-                    //Takes the invalid adjacents and sizes up the posible invalid diagonals 
-                    var excluded = new Tuple<int, int>(directions[limit].Item1 + invalid.Item1, directions[limit].Item2 + invalid.Item2);
-
-                    var index = adjacents.FindIndex(t => t.Item1 == excluded.Item1 && t.Item2 == excluded.Item2);
-                    //If excluded cell shares a side (top,bottom,right or left) with a diagonal of the actual position, it is deleted.
-                    if (index > -1 && adjacents[index].Item3>0) { adjacents.RemoveAt(index); }
                 }
             }
             return adjacents;
