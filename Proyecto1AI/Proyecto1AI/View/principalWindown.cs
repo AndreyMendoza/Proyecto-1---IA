@@ -86,7 +86,7 @@ namespace Proyecto1AI.View
             visualBoard[i, j].Paint += new PaintEventHandler((sender, e) =>
             {
                 e.Graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-                e.Graphics.DrawString("["+i.ToString()+","+j.ToString()+"]", new Font("Arial", 10, FontStyle.Bold), Brushes.Black, 0, 0);
+                e.Graphics.DrawString("["+(i+1).ToString()+","+(j+1).ToString()+"]", new Font("Arial", 10, FontStyle.Bold), Brushes.Black, 0, 0);
             });
             boardPanel.Controls.Add(visualBoard[i, j]);
 
