@@ -33,9 +33,14 @@ namespace Proyecto1AI.Controller
             LuisEndpointURL = ConfigurationManager.AppSettings["LuisEndpointURL"];
             SpeechAPISubscriptionKey = ConfigurationManager.AppSettings["SpeechAPISubscriptionKey"];
             AuthorizationToken = new Authentication();
+            CreateMicrophoneRecoClientWithIntent();
+
+
             Board = new Board("Paché", 5, 5, 5);
             Board.Show();
-            CreateMicrophoneRecoClientWithIntent();
+            MainFrame = new principalWindown(Board);
+            MainFrame.ShowDialog();
+            //MainFrame.DrawBestPath();
 
         }
 
@@ -346,7 +351,7 @@ namespace Proyecto1AI.Controller
                     else if (Origin.Equals("") && !Destiny.Equals(""))
                     {
                         DestinyPositions = ExtractCoordinates(Destiny, "destino");
-                        if(Board.AddObstacle(DestinyPositions))
+                        if (Board.AddObstacle(DestinyPositions))
                         {
                             TextToSpeech("¡Demonios! Ahora la tengo más difícil!");
                         }

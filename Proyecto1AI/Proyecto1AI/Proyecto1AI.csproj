@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1031EDA4-2D48-4176-A583-ABF253C28FAD}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>Proyecto1AI</RootNamespace>
     <AssemblyName>Proyecto1AI</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>

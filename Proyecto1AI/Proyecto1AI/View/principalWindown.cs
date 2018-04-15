@@ -19,13 +19,13 @@ namespace Proyecto1AI.View
     {
         public Board board { get; set; }// = new Board("Paché", 17, 7, 5);
         Boolean showingPath = false;
-        PictureBox [,] visualBoard = new PictureBox[7,17];
+        PictureBox[,] visualBoard;
         Node lastPath;
 
         public principalWindown(Board Board)
         {
             board = Board;
-            //SpeechRecognition mc = new SpeechRecognition();
+            visualBoard = new PictureBox[5, 5];
             InitializeComponent();
         }
 
@@ -95,7 +95,7 @@ namespace Proyecto1AI.View
 
         }
 
-        public void DrawBestPath(Board board) {
+        public void DrawBestPath() {
 
             Node actualPath = board.ShortestPath();
             lastPath = actualPath;
@@ -122,7 +122,7 @@ namespace Proyecto1AI.View
 
         }
 
-        public void CleanPath(Board board)
+        public void CleanPath()
         {
 
             if (showingPath == true) {
@@ -153,13 +153,13 @@ namespace Proyecto1AI.View
 
         private void button1_Click(object sender, EventArgs e)
         {
-           // DrawBestPath();
+           DrawBestPath();
 
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //CleanPath();
+            CleanPath();
         }
     }
 }

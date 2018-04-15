@@ -15,9 +15,9 @@ namespace Proyecto1AI
         static void Main()
         {
             //Board board = new Board("Paché", 5, 5, 5);
-            //principalWindown PrincipalWindown = new principalWindown();
+            //principalWindown PrincipalWindown = new principalWindown(board);
 
-            //Console.Write(board.BoardMatrix);
+            ////Console.Write(board.BoardMatrix);
 
 
             //PrincipalWindown.ShowDialog();
