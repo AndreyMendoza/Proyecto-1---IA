@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1031EDA4-2D48-4176-A583-ABF253C28FAD}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <RootNamespace>Proyecto1AI</RootNamespace>
     <AssemblyName>Proyecto1AI</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -42,6 +42,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -61,6 +62,9 @@
     <Compile Include="Controller\MainController.cs" />
     <Compile Include="Model\BoardPositionStatus.cs" />
     <Compile Include="Model\AgentMovement.cs" />
+    <Compile Include="Model\Entity.cs" />
+    <Compile Include="Model\Intent.cs" />
+    <Compile Include="Model\LuisAPIAnswer.cs" />
     <Compile Include="Model\Node.cs" />
     <Compile Include="Model\InputOptions.cs" />
     <Compile Include="Model\VoiceGender.cs" />

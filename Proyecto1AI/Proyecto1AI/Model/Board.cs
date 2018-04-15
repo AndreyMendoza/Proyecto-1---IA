@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Proyecto1AI.Model
 {
@@ -10,7 +8,7 @@ namespace Proyecto1AI.Model
     {
         public List<BoardItem> Obstacles { get; set; } = new List<BoardItem>();
         public Agent Agent { get; set; } = new Agent();
-        public bool IsDiagonal = true;
+        public bool IsDiagonal = false;
         public Tuple<int, int> Size { get; set; }
         public int ItemSize { get; set; }
         public int[,] BoardMatrix { get; set; }
@@ -419,6 +417,17 @@ namespace Proyecto1AI.Model
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
+        // Print the Board in console
+        public void Show()
+        {
+            Console.WriteLine("\n----------------------------------------------\n");
+            for (int i = 0; i <= Size.Item1; i++)
+            {
+                for (int j = 0; j <= Size.Item2; j++)
+                    Console.Write("{0} ", BoardMatrix[i, j]);
+                Console.WriteLine();
+            }
+        }
 
     }
 }

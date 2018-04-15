@@ -14,19 +14,24 @@ namespace Proyecto1AI
 
         static void Main()
         {
-            Board board = new Board("Paché", 5, 5, 5);
-            principalWindown PrincipalWindown = new principalWindown();
+            //Board board = new Board("Paché", 5, 5, 5);
+            //principalWindown PrincipalWindown = new principalWindown();
 
-            Console.Write(board.BoardMatrix);
-
-
-            PrincipalWindown.ShowDialog();
-            
-            PrincipalWindown.DrawBestPath();
-            //PrincipalWindown.CleanPath();
+            //Console.Write(board.BoardMatrix);
 
 
+            //PrincipalWindown.ShowDialog();
 
+            //PrincipalWindown.DrawBestPath();
+            ////PrincipalWindown.CleanPath();
+
+            SpeechRecognition mc = new SpeechRecognition();
+
+            //mc.TextToSpeech("Hola a todos");
+
+            //mc.CreateMicrophoneRecoClientWithIntent();
+
+            //Console.ReadLine();
         }
     }
 }

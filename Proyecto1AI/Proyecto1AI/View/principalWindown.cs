@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Proyecto1AI.Controller;
 using Proyecto1AI.Model;
 using Proyecto1AI.Properties;
 
@@ -14,15 +15,17 @@ namespace Proyecto1AI.View
 {
     
 
-    public partial class principalWindown : Form
+    partial class principalWindown : Form
     {
-        Board board = new Board("Paché", 17, 7, 5);
+        public Board board { get; set; }// = new Board("Paché", 17, 7, 5);
         Boolean showingPath = false;
         PictureBox [,] visualBoard = new PictureBox[7,17];
         Node lastPath;
 
-        public principalWindown()
+        public principalWindown(Board Board)
         {
+            board = Board;
+            //SpeechRecognition mc = new SpeechRecognition();
             InitializeComponent();
         }
 
@@ -92,7 +95,7 @@ namespace Proyecto1AI.View
 
         }
 
-        public void DrawBestPath() {
+        public void DrawBestPath(Board board) {
 
             Node actualPath = board.ShortestPath();
             lastPath = actualPath;
@@ -119,7 +122,7 @@ namespace Proyecto1AI.View
 
         }
 
-        public void CleanPath()
+        public void CleanPath(Board board)
         {
 
             if (showingPath == true) {
@@ -150,13 +153,13 @@ namespace Proyecto1AI.View
 
         private void button1_Click(object sender, EventArgs e)
         {
-            DrawBestPath();
+           // DrawBestPath();
 
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            CleanPath();
+            //CleanPath();
         }
     }
 }

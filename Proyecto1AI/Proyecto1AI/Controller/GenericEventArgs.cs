@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Proyecto1AI.Controller
 {
@@ -15,7 +11,7 @@ namespace Proyecto1AI.Controller
         // Constructor
         public GenericEventArgs(T eventData)
         {
-            this.EventData = eventData;
+            EventData = eventData;
         }
 
     }

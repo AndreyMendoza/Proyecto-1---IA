@@ -1,21 +1,13 @@
-﻿using Proyecto1AI.Controller;
-using System.IO;
-using System.Media;
-using System.Threading;
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Proyecto1AI.Model;
 using Proyecto1AI.View;
 
-namespace Proyecto1AI.Model
+namespace Proyecto1AI.Controller
 {
     class MainController
     {
         private Board Board;
-        public string NextAction { get; set; } = "";
-        public Semaphore mutex { get; set; } = new Semaphore(0, 1, "NextAction");
+
+        SpeechRecognition mca = new SpeechRecognition();
         
         
         public MainController()

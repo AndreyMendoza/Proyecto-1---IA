@@ -5,16 +5,23 @@ using System.Media;
 using System.IO;
 using System.Threading;
 using Proyecto1AI.Model;
+using System.Web.Script.Serialization;
+using System.Collections.Generic;
+using Proyecto1AI.View;
+using System.Text.RegularExpressions;
 
 namespace Proyecto1AI.Controller
 {
-    class SpeechRecognition
+    public class SpeechRecognition
     {
         private MicrophoneRecognitionClient Microphone;
         private string RecognitionLanguage;
         private string LuisEndpointURL;
         private string SpeechAPISubscriptionKey;
-        Authentication AuthorizationToken;
+        private Authentication AuthorizationToken;
+        private Board Board;
+        private principalWindown MainFrame;
+        int m = 10, n = 10, a = 10;
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,6 +33,10 @@ namespace Proyecto1AI.Controller
             LuisEndpointURL = ConfigurationManager.AppSettings["LuisEndpointURL"];
             SpeechAPISubscriptionKey = ConfigurationManager.AppSettings["SpeechAPISubscriptionKey"];
             AuthorizationToken = new Authentication();
+            Board = new Board("Paché", 5, 5, 5);
+            Board.Show();
+            CreateMicrophoneRecoClientWithIntent();
+
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -58,6 +69,31 @@ namespace Proyecto1AI.Controller
         {
             Console.WriteLine("--- Intent received by OnIntentHandler() ---");
             Console.WriteLine("{0}", e.Payload);
+
+            LuisAPIAnswer answer = new JavaScriptSerializer().Deserialize<LuisAPIAnswer>(e.Payload);
+
+            if (!answer.topScoringIntent.Equals("None"))
+            {
+                switch (answer.topScoringIntent.intent)
+                {
+                    case "Movement":
+                        MovementEntityHandler(answer.entities);
+                        break;
+                    case "ChangeObjectPosition":
+                        ChangeObjectPositionHandler(answer.entities);
+                        break;
+                    case "Questions":
+                        QuestionsHandler(answer.entities);
+                        break;
+                    case "InputParameters":
+                        InputParametersHandler(answer.entities);
+                        break;
+                    case "None":
+                        TextToSpeech("No entiendo lo que quieres decir. Intenta de nuevo.");
+                        break;
+                }
+
+            }
             Console.WriteLine();
         }
 
@@ -94,7 +130,7 @@ namespace Proyecto1AI.Controller
             Microphone.EndMicAndRecognition();
 
             WriteResponseResult(e);
-            
+
             CreateMicrophoneRecoClientWithIntent();
         }
 
@@ -117,11 +153,10 @@ namespace Proyecto1AI.Controller
 
             Microphone =
                 SpeechRecognitionServiceFactory.CreateMicrophoneClientWithIntentUsingEndpointUrl(
-                    "es-mx",
-                    "dde02807d8774dda941ad6b233e7f983", // Subscription Key
-                    "https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/35d7e441-af3b-4d93-851c-b6b61f44306b?subscription-key=7c8d53150eef43278ac4f89b956c06e8&verbose=true&timezoneOffset=0&q=");
+                    RecognitionLanguage,
+                    SpeechAPISubscriptionKey,
+                    LuisEndpointURL);
 
-            Microphone.AuthenticationUri = "";
             Microphone.OnIntent += OnIntentHandler;
 
             // Event handlers for speech recognition results
@@ -135,11 +170,12 @@ namespace Proyecto1AI.Controller
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
-        
+
         // Handler that conert from text to voice and reproduce it
-        public static void PlayAudio(object sender, GenericEventArgs<Stream> args)
+        public void PlayAudio(object sender, GenericEventArgs<Stream> args)
         {
             SoundPlayer player = new SoundPlayer(args.EventData);
+
             player.PlaySync();
             args.EventData.Dispose();
         }
@@ -158,7 +194,7 @@ namespace Proyecto1AI.Controller
         public void TextToSpeech(string InputText)
         {
             Synthesize Cortana = new Synthesize();
-
+            
             Cortana.OnAudioAvailable += PlayAudio;
             Cortana.OnError += ErrorHandler;
 
@@ -170,5 +206,295 @@ namespace Proyecto1AI.Controller
             }).Wait();
         }
 
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Handle Movement entity
+        public void MovementEntityHandler(List<Entity> Entities)
+        {
+            string TextDirection = "";
+            AgentMovement FinalDirection;
+
+            // Verify if the movement is diagonal
+            foreach (Entity entity in Entities)
+            {
+                if (entity.type.Equals("DireccionDiagonal"))
+                    TextDirection = entity.entity;
+            }
+
+            // TextDirection is empty, which means it is not a diagonal.
+            if (TextDirection.Equals(""))
+            {
+                foreach (Entity entity in Entities)
+                {
+                    if (entity.type.Equals("Direccion"))
+                        TextDirection = entity.entity;
+                }
+            }
+
+            switch (TextDirection)
+            {
+                case "arriba":
+                    FinalDirection = AgentMovement.Up;
+                    break;
+                case "abajo":
+                    FinalDirection = AgentMovement.Down;
+                    break;
+                case "izquierda":
+                    FinalDirection = AgentMovement.Left;
+                    break;
+                case "derecha":
+                    FinalDirection = AgentMovement.Right;
+                    break;
+                case "arriba derecha":
+                case "derecha arriba":
+                    FinalDirection = AgentMovement.UpRight;
+                    break;
+                case "arriba izquierda":
+                case "izquierda arriba":
+                    FinalDirection = AgentMovement.UpLeft;
+                    break;
+                case "abajo derecha":
+                case "derecha abajo":
+                    FinalDirection = AgentMovement.DownRight;
+                    break;
+                case "abajo izquierda":
+                case "izquierda abajo":
+                    FinalDirection = AgentMovement.DownLeft;
+                    break;
+                default:
+                    TextToSpeech("No reconozco la dirección a la que quieres ir.");
+                    return;
+            }
+
+            // Save the previous position in order to clear the draw
+            Tuple<int, int> PreviousAgentPosition = Board.Agent.Position;
+            if (Board.MoveAgent(FinalDirection))
+            {
+                Board.Show();
+                TextToSpeech("Me he movido!");
+            }
+            else
+                TextToSpeech("No puedo moverme a esa posición, está en uso!");
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Handle Movement entity
+        public void ChangeObjectPositionHandler(List<Entity> Entities)
+        {
+            string ObjectiveText = "";
+            string Origin = "";
+            string Destiny = "";
+            Node OriginPositions;
+            Node DestinyPositions;
+
+            // Extract the entities
+            foreach (Entity entity in Entities)
+            {
+                switch (entity.type)
+                {
+                    case "objetivo":
+                        ObjectiveText = entity.entity;
+                        break;
+                    case "Desde":
+                        Origin = entity.entity;
+                        break;
+                    case "Hacia":
+                        Destiny = entity.entity;
+                        break;
+                }
+            }           
+
+            switch (ObjectiveText)
+            {
+                // Change agent's position
+                case "agente":
+                case "gente":
+                    DestinyPositions = ExtractCoordinates(Destiny, "destino");
+
+                    if (Board.ChangeAgentPosition(DestinyPositions))
+                    {
+                        TextToSpeech("¡Wow!, me has teletransportado!");
+                    }
+                    else
+                        TextToSpeech("No puedo moverme " + Destiny + ". Fíjate que esté libre y dentro del tablero.");
+                    break;
+
+                // Change agent's goal
+                case "meta":
+                    DestinyPositions = ExtractCoordinates(Destiny, "destino");
+
+                    if (Board.ChangeAgentGoal(DestinyPositions))
+                    {
+                        TextToSpeech("¡Vaya!, ¡que indeciso eres!");
+                    }
+                    else
+                        TextToSpeech("No podemos ir " + Destiny + ". Fíjate que esté libre y dentro del tablero.");
+                    break;
+                case "obstáculo":
+                case "obstáculos":
+                    // This means delete object
+                    if (!Origin.Equals("") && Destiny.Equals(""))
+                    {
+                        OriginPositions = ExtractCoordinates(Origin, "origen");
+                        if (Board.DeleteObstacle(new Tuple<int, int>(OriginPositions.X, OriginPositions.Y)))
+                        {
+                            TextToSpeech("¡Bien! Tengo más claro mi camino!");
+                        }
+                    }
+                    // Add obstacle
+                    else if (Origin.Equals("") && !Destiny.Equals(""))
+                    {
+                        DestinyPositions = ExtractCoordinates(Destiny, "destino");
+                        if(Board.AddObstacle(DestinyPositions))
+                        {
+                            TextToSpeech("¡Demonios! Ahora la tengo más difícil!");
+                        }
+                    }
+                    break;
+            }
+            
+            Board.Show();
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Handle Movement entity
+        public void QuestionsHandler(List<Entity> Entities)
+        {
+            string ObjectiveText = "";
+
+            // Extract the entities
+            foreach (Entity entity in Entities)
+            {
+                switch (entity.type)
+                {
+                    case "objetivo":
+                        ObjectiveText = entity.entity;
+                        break;
+                }
+            }
+
+            switch (ObjectiveText)
+            {
+                // Change agent's position
+                case "en diagonal":
+                    if (Board.IsDiagonal)
+                        TextToSpeech("Sí puedo!");
+                    else
+                        TextToSpeech("Sí puedo, pero me lo tienes prohibido.");
+                    break;
+                case "tu nombre":
+                    TextToSpeech("Me llamo " + Board.Agent.Name);
+                    break;
+            }
+
+            Board.Show();
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Handles the InputParameters entity
+        public void InputParametersHandler(List<Entity> Entities)
+        {
+            string ObjectiveText = "";
+            string Decimal = "@";
+
+            // Extract the entities
+            foreach (Entity entity in Entities)
+            {
+                switch (entity.type)
+                {
+                    case "objetivo":
+                        ObjectiveText = entity.entity;
+                        break;
+                    case "igual":
+                        Decimal = entity.entity;
+                        break;
+                }
+            }
+
+            bool result = false;
+            switch (ObjectiveText)
+            {
+                // Change agent's position
+                case "crear tablero":
+                    if (m != -1 && n != -1 && a != -1)
+                    {
+                        Board = new Board("Pache", m, n, a);
+                        Console.WriteLine("Tablero creado");
+                        TextToSpeech("Tablero de " + m + " por " + n + " con cuadrículas de tamaño " + a + "creado!");
+                    }
+                    else
+                    {
+                        string ErrorMessage = "Me falta conocer ";
+                        if (m == -1)
+                            ErrorMessage += "el largo";
+                        if (n == -1)
+                            ErrorMessage += "el ancho";
+                        if (a == -1)
+                            ErrorMessage += "el tamaño de cada cuadrícula";
+                        TextToSpeech(ErrorMessage + " para poder construirlo.");
+                    }
+                    break;
+                case "tamaño":
+                    result = Int32.TryParse(Regex.Match(Decimal, @"\d+").Value, out a);
+                    if (!result || a == 0)
+                        a = -1;
+                    else
+                        TextToSpeech("Listo.Ahora el tamaño de cada cuadícula es de ." + a);
+                    break;
+                case "largo":
+                    result = Int32.TryParse(Regex.Match(Decimal, @"\d+").Value, out m);
+                    if (!result || m == 0)
+                        m = -1;
+                    else
+                        TextToSpeech("Listo.Ahora el largo es de ." + m);
+                    break;
+                case "ancho":
+                    result = Int32.TryParse(Regex.Match(Decimal, @"\d+").Value, out n);
+                    if (!result || n == 0)
+                        a = -1;
+                    else
+                        TextToSpeech("Listo.Ahora el ancho es de ." + n);
+                    break;
+                case "mejor ruta":
+                    if (Board.ShortestPath() == null)
+                        TextToSpeech("Rayos, estoy encerrado. No hay ruta a la meta fijada!");
+                    else
+                        TextToSpeech("Yuhu! Llegamos a la meta!");
+                    break;
+            }
+
+            Board.Show();
+        }
+
+        // ----------------------------------------------------------------------------------------------------------------------------------------
+
+        // Extract two decimals from a string and return it
+        private Node ExtractCoordinates(string input, string Type)
+        {
+            MatchCollection toPositions = Regex.Matches(input, @"\d+");
+            Node DestinyPositions = new Node();
+            try
+            {
+                DestinyPositions.X = Int32.Parse(toPositions[0].Value) - 1;
+                DestinyPositions.Y = Int32.Parse(toPositions[1].Value) - 1;
+            }
+            catch (ArgumentNullException e)
+            {
+                TextToSpeech("No has ingresado la posición de " + Type + ". Prueba con 1,2 por ejemplo.");
+            }
+            catch (FormatException e)
+            {
+                TextToSpeech("No he podido entender la posición de " + Type + ". Prueba con 3,4 por ejemplo.");
+            }
+            catch (Exception e)
+            {
+                DestinyPositions.X = -1;
+                DestinyPositions.Y = -1;
+            }
+            return DestinyPositions;
+        }
     }
 }

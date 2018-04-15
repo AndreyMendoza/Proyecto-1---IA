@@ -12,7 +12,14 @@
 5) Toma de comandos por voz
 6) GUI
 
-
+Install Recognition Services command: 
+	- Install-Package Microsoft.ProjectOxford.SpeechRecognition-x64 -Version 1.0.0.7
 
 
 LUIS API
+
+	- Intents: represents actions the user wants to perform.
+	- Utterances: is text input from the user that your app needs to understand.
+	- Entities: represents detailed information that is relevant in the utterance.
+	
+	https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/d7db0e02-88b3-4b68-b3d2-bcff129e581c?subscription-key=7c8d53150eef43278ac4f89b956c06e8&amp;verbose=true&amp;timezoneOffset=0&amp;q=
