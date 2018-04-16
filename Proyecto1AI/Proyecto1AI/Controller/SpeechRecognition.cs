@@ -40,7 +40,6 @@ namespace Proyecto1AI.Controller
             Board.Show();
             MainFrame = new principalWindown(Board);
             MainFrame.ShowDialog();
-            //MainFrame.DrawBestPath();
 
         }
 
