@@ -99,7 +99,8 @@ namespace Proyecto1AI.Controller
                         break;
                 }
             }
-            Console.WriteLine();
+            else
+                TextToSpeech("Esa acción no la conozco. Intenta de nuevo!");
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
