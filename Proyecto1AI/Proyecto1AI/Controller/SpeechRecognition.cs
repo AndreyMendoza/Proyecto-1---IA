@@ -100,7 +100,7 @@ namespace Proyecto1AI.Controller
                 }
             }
             else
-                TextToSpeech("Esa acción no la conozco. Intenta de nuevo!");
+                TextToSpeech("Esa acción no la conozco. ¡Intenta de nuevo!");
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
