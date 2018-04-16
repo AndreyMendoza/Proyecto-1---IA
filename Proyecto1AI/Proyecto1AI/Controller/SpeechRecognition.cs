@@ -21,7 +21,7 @@ namespace Proyecto1AI.Controller
         private Authentication AuthorizationToken;
         private Board Board;
         private principalWindown MainFrame;
-        int m = 10, n = 10, a = 10;
+        int m = -1, n = -1, a = -1;
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,7 +36,7 @@ namespace Proyecto1AI.Controller
             CreateMicrophoneRecoClientWithIntent();
 
 
-            Board = new Board("Paché", 5, 5, 5);
+            Board = new Board("Paché", 6, 5, 5);
             Board.Show();
             MainFrame = new principalWindown(Board);
             MainFrame.ShowDialog();
@@ -79,6 +79,7 @@ namespace Proyecto1AI.Controller
 
             if (!answer.topScoringIntent.Equals("None"))
             {
+                MainFrame.CleanPath();
                 switch (answer.topScoringIntent.intent)
                 {
                     case "Movement":
@@ -97,7 +98,6 @@ namespace Proyecto1AI.Controller
                         TextToSpeech("No entiendo lo que quieres decir. Intenta de nuevo.");
                         break;
                 }
-
             }
             Console.WriteLine();
         }
@@ -272,11 +272,23 @@ namespace Proyecto1AI.Controller
             }
 
             // Save the previous position in order to clear the draw
-            Tuple<int, int> PreviousAgentPosition = Board.Agent.Position;
-            if (Board.MoveAgent(FinalDirection))
+            Node PreviousAgentPosition = new Node()
             {
+                X = Board.Agent.Position.Item1,
+                Y = Board.Agent.Position.Item2
+            };
+            Node NewPosition = Board.CreateMovement(FinalDirection);
+
+            if (Board.IsValidMovement(NewPosition))
+            {
+                List<Node> positions = new List<Node>();
+                positions.Add(PreviousAgentPosition);
+                positions.Add(NewPosition);
+
+                MainFrame.UpdateItemPosition(positions);
                 Board.Show();
                 TextToSpeech("Me he movido!");
+                Board.MoveAgent(FinalDirection);
             }
             else
                 TextToSpeech("No puedo moverme a esa posición, está en uso!");
@@ -308,18 +320,29 @@ namespace Proyecto1AI.Controller
                         Destiny = entity.entity;
                         break;
                 }
-            }           
+            }
 
+            List<Node> Positions = new List<Node>();
+            Node ActualPosition;
             switch (ObjectiveText)
             {
                 // Change agent's position
                 case "agente":
                 case "gente":
+                    ActualPosition = new Node()
+                    {
+                        X = Board.Agent.Position.Item1,
+                        Y = Board.Agent.Position.Item2
+                    };
                     DestinyPositions = ExtractCoordinates(Destiny, "destino");
 
-                    if (Board.ChangeAgentPosition(DestinyPositions))
+                    if (Board.IsValidMovement(DestinyPositions))
                     {
-                        TextToSpeech("¡Wow!, me has teletransportado!");
+                        Positions.Add(ActualPosition);
+                        Positions.Add(DestinyPositions);
+                        MainFrame.UpdateItemPosition(Positions);
+                        Board.ChangeAgentPosition(DestinyPositions);
+                        TextToSpeech("¡Wow!, ¿me has teletransportado?");
                     }
                     else
                         TextToSpeech("No puedo moverme " + Destiny + ". Fíjate que esté libre y dentro del tablero.");
@@ -327,10 +350,19 @@ namespace Proyecto1AI.Controller
 
                 // Change agent's goal
                 case "meta":
+                    ActualPosition = new Node()
+                    {
+                        X = Board.Agent.Goal.Item1,
+                        Y = Board.Agent.Goal.Item2
+                    };
                     DestinyPositions = ExtractCoordinates(Destiny, "destino");
 
-                    if (Board.ChangeAgentGoal(DestinyPositions))
+                    if (Board.IsValidMovement(DestinyPositions))
                     {
+                        Positions.Add(ActualPosition);
+                        Positions.Add(DestinyPositions);
+                        MainFrame.UpdateItemPosition(Positions);
+                        Board.ChangeAgentGoal(DestinyPositions);
                         TextToSpeech("¡Vaya!, ¡que indeciso eres!");
                     }
                     else
@@ -344,8 +376,11 @@ namespace Proyecto1AI.Controller
                         OriginPositions = ExtractCoordinates(Origin, "origen");
                         if (Board.DeleteObstacle(new Tuple<int, int>(OriginPositions.X, OriginPositions.Y)))
                         {
+                            MainFrame.UpDateMatrix(OriginPositions.X, OriginPositions.Y, 0);
                             TextToSpeech("¡Bien! Tengo más claro mi camino!");
                         }
+                        else
+                            TextToSpeech("No hay obstáculo en esa posición");
                     }
                     // Add obstacle
                     else if (Origin.Equals("") && !Destiny.Equals(""))
@@ -353,12 +388,12 @@ namespace Proyecto1AI.Controller
                         DestinyPositions = ExtractCoordinates(Destiny, "destino");
                         if (Board.AddObstacle(DestinyPositions))
                         {
+                            MainFrame.UpDateMatrix(DestinyPositions.X, DestinyPositions.Y, 1);
                             TextToSpeech("¡Demonios! Ahora la tengo más difícil!");
                         }
                     }
                     break;
-            }
-            
+            }            
             Board.Show();
         }
 
@@ -424,11 +459,13 @@ namespace Proyecto1AI.Controller
             {
                 // Change agent's position
                 case "crear tablero":
-                    if (m != -1 && n != -1 && a != -1)
+                    if (m > 0 && n > 0 && a > 0)
                     {
                         Board = new Board("Pache", m, n, a);
-                        Console.WriteLine("Tablero creado");
+                        MainFrame.DisposeFrame();
+                        MainFrame = new principalWindown(Board);
                         TextToSpeech("Tablero de " + m + " por " + n + " con cuadrículas de tamaño " + a + "creado!");
+                        MainFrame.ShowDialog();
                     }
                     else
                     {
@@ -467,7 +504,23 @@ namespace Proyecto1AI.Controller
                     if (Board.ShortestPath() == null)
                         TextToSpeech("Rayos, estoy encerrado. No hay ruta a la meta fijada!");
                     else
-                        TextToSpeech("Yuhu! Llegamos a la meta!");
+                        TextToSpeech("¡Hostia, llegamos a la meta!");
+                    MainFrame.DrawBestPath();
+                    break;
+                case "limpiar tablero":
+                    MainFrame.CleanPath();
+                    break;
+                case "cambiar diagonal":
+                    if (Board.IsDiagonal)
+                    {
+                        Board.IsDiagonal = false;
+                        TextToSpeech("¿Qué demonios? La tienes contra mí?.");
+                    }
+                    else
+                    {
+                        Board.IsDiagonal = true;
+                        TextToSpeech("Bien! Ahora me será más fácil llegar a la meta.");
+                    }
                     break;
             }
 

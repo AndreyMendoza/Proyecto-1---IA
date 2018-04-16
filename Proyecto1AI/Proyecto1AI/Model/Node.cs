@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Proyecto1AI.Model
 {
-    class Node
+    class Node 
     {
         public int X;
         public int Y;

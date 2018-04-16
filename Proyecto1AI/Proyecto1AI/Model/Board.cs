@@ -177,7 +177,7 @@ namespace Proyecto1AI.Model
         // ----------------------------------------------------------------------------------------------------------------------------------------
 
         // Moves the agent in the board if possible
-        public bool MoveAgent(AgentMovement Direction)
+        public Node MoveAgent(AgentMovement Direction)
         {
             Node MovementPosition = CreateMovement(Direction);
 
@@ -188,9 +188,9 @@ namespace Proyecto1AI.Model
                 Agent.Position = new Tuple<int,int>(MovementPosition.X, MovementPosition.Y);
                 BoardMatrix[Agent.Position.Item1, Agent.Position.Item2] = (int)BoardPositionStatus.Agent;
 
-                return true;
+                return MovementPosition;
             }
-            return false;
+            return null;
         }
 
         // ----------------------------------------------------------------------------------------------------------------------------------------
